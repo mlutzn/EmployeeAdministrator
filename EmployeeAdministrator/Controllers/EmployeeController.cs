@@ -10,7 +10,7 @@ namespace API.Controllers
     {
         private readonly IEmployeeConnector _employeeconector;
 
-        public EmployeeController(IEmployeeConnector employeeconector)
+        public EmployeeController(AppLogic.IEmployeeConnector employeeconector)
         {
             _employeeconector = employeeconector;
         }

@@ -27,7 +27,7 @@ namespace AppLogic
 
         public async Task<List<Employee>> RetrieveAllEmployees()
         {
-            string serviceUrl = "/api/RH/GetAllEmployees";
+            string serviceUrl = "/api/GetAllEmployees";
             string result = await InvokeGetAsync(serviceUrl);
             var dtoEmployees = JsonConvert.DeserializeObject<List<Employee>>(result);
 
@@ -35,7 +35,7 @@ namespace AppLogic
         }
         public async Task<List<string>> RetrieveAllSpecialties()
         {
-            string serviceUrl = "/api/RH/GetSpecialties";
+            string serviceUrl = "/api/GetSpecialties";
             string result = await InvokeGetAsync(serviceUrl);
             var specialtiesStrings = JsonConvert.DeserializeObject<List<string>>(result);
 
