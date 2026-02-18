@@ -8,12 +8,12 @@ namespace AppLogic
         Task<List<Employee>> RetrieveAllEmployees();
         Task<List<string>> RetrieveAllSpecialties();
     }
-    public class RHConnector : IEmployeeConnector
+    public class EmployeeConnector : IEmployeeConnector
     {
         private static HttpClient _httpClient;
-        private const string _baseUrl = "https://rh-central.azurewebsites.net/";
+        private const string _baseUrl = "https://employee.azurewebsites.net/";
 
-        public RHConnector()
+        public EmployeeConnector()
         {
             if (_httpClient is null)
             {

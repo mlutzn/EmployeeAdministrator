@@ -7,9 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IPatientManager, PatientManager>();
-builder.Services.AddSingleton<IRHConnector, RHConnector>();
-builder.Services.AddSingleton<IAppointmentManager, AppointmentManager>();
+builder.Services.AddSingleton<IEmployeeConnector, EmployeeConnector>();
 
 var app = builder.Build();
 
