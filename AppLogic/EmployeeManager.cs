@@ -1,54 +1,146 @@
 ﻿using DTO;
 using Newtonsoft.Json;
+using RestSharp;
 
 namespace AppLogic
 {
     public interface IEmployeeConnector
     {
         Task<List<Employee>> RetrieveAllEmployees();
-        Task<List<string>> RetrieveAllSpecialties();
+        Task<List<Employee>> GetAllEmployeesRestSharp();
+        Task<List<Employee>> GetAllEmployeesFlurl();
+        Task<Employee?> GetEmployeeManager(int employeeId);
+        Task<List<Employee>> GetOldestEmployee();
+        Task<List<Employee>> GetNewestEmployee();
+        Task<Employee?> GetEmployeeById(int id);
+        Task<List<Employee>> GetEmployeesWithMoreThan(int years);
+        Task<List<Employee>> GetEmployeesWithLessThan(int years);
+
     }
+
     public class EmployeeConnector : IEmployeeConnector
     {
-        private static HttpClient _httpClient;
-        private const string _baseUrl = "https://employee.azurewebsites.net/";
-
+        private HttpClient? _httpClient;
+        private const string _baseUrl = "https://rh-central.azurewebsites.net/";
         public EmployeeConnector()
         {
-            if (_httpClient is null)
-            {
-                _httpClient = new HttpClient()
-                {
-                    BaseAddress = new Uri(_baseUrl),
-                    Timeout = TimeSpan.FromSeconds(15)
-                };
-            }
+            InitializeHttpClient();
         }
 
+        private void InitializeHttpClient()
+        {
+            _httpClient = new HttpClient()
+            {
+                BaseAddress = new Uri(_baseUrl),
+                Timeout = TimeSpan.FromSeconds(15)
+            };
+        }
+
+        #region Métodos Originales
         public async Task<List<Employee>> RetrieveAllEmployees()
         {
-            string serviceUrl = "/api/GetAllEmployees";
+            string serviceUrl = "/api/RH/GetAllEmployees";
             string result = await InvokeGetAsync(serviceUrl);
             var dtoEmployees = JsonConvert.DeserializeObject<List<Employee>>(result);
 
-            return dtoEmployees;
+            return dtoEmployees ?? new List<Employee>();
         }
-        public async Task<List<string>> RetrieveAllSpecialties()
+        #endregion
+
+        public async Task<Employee?> GetEmployeeManager(int employeeId)
         {
-            string serviceUrl = "/api/GetSpecialties";
-            string result = await InvokeGetAsync(serviceUrl);
-            var specialtiesStrings = JsonConvert.DeserializeObject<List<string>>(result);
+            var employees = await RetrieveAllEmployees();
+            var employee = employees.FirstOrDefault(e => e.Id == employeeId);
 
-            return specialtiesStrings;
+            if (employee?.ManagerId == null)
+                return null;
+
+            return employees.FirstOrDefault(e => e.Id == employee.ManagerId);
         }
 
-        #region Metodos Helpers
+        public async Task<List<Employee>> GetOldestEmployee()
+        {
+            var employees = await RetrieveAllEmployees();
+
+            if (!employees.Any())
+                return new List<Employee>();
+
+            var employeesWithDates = employees
+                .Where(e => DateTime.TryParse(e.HiringDate, out _))
+                .ToList();
+
+            if (!employeesWithDates.Any())
+                return new List<Employee>();
+
+            var oldestHiringDate = employeesWithDates
+                .Min(e => DateTime.Parse(e.HiringDate));
+
+            return employeesWithDates
+                .Where(e => DateTime.Parse(e.HiringDate) == oldestHiringDate)
+                .ToList();
+        }
+
+        public async Task<List<Employee>> GetNewestEmployee()
+        {
+            var employees = await RetrieveAllEmployees();
+
+            if (!employees.Any())
+                return new List<Employee>();
+
+            var employeesWithDates = employees
+                .Where(e => DateTime.TryParse(e.HiringDate, out _))
+                .ToList();
+
+            if (!employeesWithDates.Any())
+                return new List<Employee>();
+
+            var newestHiringDate = employeesWithDates
+                .Max(e => DateTime.Parse(e.HiringDate));
+
+            return employeesWithDates
+                .Where(e => DateTime.Parse(e.HiringDate) == newestHiringDate)
+                .ToList();
+        }
+        public async Task<Employee?> GetEmployeeById(int id)
+        {
+            var employees = await RetrieveAllEmployees();
+            return employees.FirstOrDefault(e => e.Id == id);
+        }
+        public async Task<List<Employee>> GetEmployeesWithMoreThan(int years)
+        {
+            var employees = await RetrieveAllEmployees();
+            var cutoffDate = DateTime.Now.AddYears(-years);
+
+            return employees
+                .Where(e => DateTime.TryParse(e.HiringDate, out var hiringDate) &&
+                           hiringDate <= cutoffDate)
+                .ToList();
+        }
+
+        public async Task<List<Employee>> GetEmployeesWithLessThan(int years)
+        {
+            var employees = await RetrieveAllEmployees();
+            var cutoffDate = DateTime.Now.AddYears(-years);
+
+            return employees
+                .Where(e => DateTime.TryParse(e.HiringDate, out var hiringDate) &&
+                           hiringDate >= cutoffDate)
+                .ToList();
+        }
+              
+
+        #region Métodos Helpers
         private async Task<string> InvokeGetAsync(string uri)
         {
             try
             {
+                if (_httpClient == null)
+                {
+                    InitializeHttpClient();
+                }
+
                 string responseString = string.Empty;
-                var results = await _httpClient.GetAsync(uri);
+                var results = await _httpClient!.GetAsync(uri);
                 if (results.IsSuccessStatusCode)
                 {
                     responseString = await results.Content.ReadAsStringAsync();
@@ -58,45 +150,19 @@ namespace AppLogic
             }
             catch (Exception e)
             {
-                throw e;
+                throw new Exception($"Error en InvokeGetAsync: {e.Message}", e);
             }
         }
-        private async Task<string> InvokePutAsync(string uri, StringContent content)
+
+        public Task<List<Employee>> GetAllEmployeesRestSharp()
         {
-            try
-            {
-                string responseString = string.Empty;
-                var results = await _httpClient.PutAsync(uri, content);
-                if (results.IsSuccessStatusCode)
-                {
-                    responseString = await results.Content.ReadAsStringAsync();
-                }
-
-                return responseString;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+            throw new NotImplementedException();
         }
-        private async Task<string> InvokePostAsync(string uri, StringContent content)
+
+        public Task<List<Employee>> GetAllEmployeesFlurl()
         {
-            try
-            {
-                string responseString = string.Empty;
-                var results = await _httpClient.PostAsync(uri, content);
-                if (results.IsSuccessStatusCode)
-                {
-                    responseString = await results.Content.ReadAsStringAsync();
-                }
-
-                return responseString;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+            throw new NotImplementedException();
         }
-        #endregion Metodos Helpers
+        #endregion
     }
 }
