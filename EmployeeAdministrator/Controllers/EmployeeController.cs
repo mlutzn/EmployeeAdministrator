@@ -1,9 +1,11 @@
 ﻿using AppLogic;
 using DTO;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [EnableCors("DemoPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeController : ControllerBase
@@ -16,140 +18,197 @@ namespace API.Controllers
         }
 
         [HttpGet("GetAllEmployees")]
-        public async Task<ActionResult<List<Employee>>> GetAllEmployees()
+        public async Task<ApiResponse> GetAllEmployees()
         {
+            var response = new ApiResponse();
             try
             {
                 var result = await _employeeconector.RetrieveAllEmployees();
-                return Ok(result);
+                response.Data = result;
+                response.Result = "ok";
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                response.Result = "error";
+                response.Message = $"Error interno: {ex.Message}";
             }
+            return response;
         }
+
         [HttpGet("GetAllEmployeesRestSharp")]
-        public async Task<ActionResult<List<Employee>>> GetAllEmployeesRestSharp()
+        public async Task<ApiResponse> GetAllEmployeesRestSharp()
         {
+            var response = new ApiResponse();
             try
             {
                 var result = await _employeeconector.GetAllEmployeesRestSharp();
-                return Ok(result);
+                response.Data = result;
+                response.Result = "ok";
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                response.Result = "error";
+                response.Message = $"Error interno: {ex.Message}";
             }
+            return response;
         }
 
         [HttpGet("GetAllEmployeesFlurl")]
-        public async Task<ActionResult<List<Employee>>> GetAllEmployeesFlurl()
+        public async Task<ApiResponse> GetAllEmployeesFlurl()
         {
+            var response = new ApiResponse();
             try
             {
                 var result = await _employeeconector.GetAllEmployeesFlurl();
-                return Ok(result);
+                response.Data = result;
+                response.Result = "ok";
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                response.Result = "error";
+                response.Message = $"Error interno: {ex.Message}";
             }
+            return response;
         }
 
         [HttpGet("GetEmployeeManager")]
-        public async Task<ActionResult<Employee?>> GetEmployeeById(int id)
+        public async Task<ApiResponse> GetEmployeeById(int id)
         {
+            var response = new ApiResponse();
             try
             {
                 var result = await _employeeconector.GetEmployeeById(id);
                 if (result == null)
-                    return NotFound($"Empleado con ID {id} no encontrado");
-
-                return Ok(result);
+                {
+                    response.Result = "error";
+                    response.Message = $"Empleado con ID {id} no encontrado";
+                }
+                else
+                {
+                    response.Data = result;
+                    response.Result = "ok";
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                response.Result = "error";
+                response.Message = $"Error interno: {ex.Message}";
             }
+            return response;
         }
 
         [HttpGet("GetEmployeeManager/{employeeId}")]
-        public async Task<ActionResult<Employee?>> GetEmployeeManager(int employeeId)
+        public async Task<ApiResponse> GetEmployeeManager(int employeeId)
         {
+            var response = new ApiResponse();
             try
             {
                 var result = await _employeeconector.GetEmployeeManager(employeeId);
                 if (result == null)
-                    return NotFound($"No se encontró manager para el empleado con ID {employeeId}");
-
-                return Ok(result);
+                {
+                    response.Result = "error";
+                    response.Message = $"No se encontró manager para el empleado con ID {employeeId}";
+                }
+                else
+                {
+                    response.Data = result;
+                    response.Result = "ok";
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                response.Result = "error";
+                response.Message = $"Error interno: {ex.Message}";
             }
+            return response;
         }
 
         [HttpGet("GetOldestEmployee")]
-        public async Task<ActionResult<List<Employee>>> GetOldestEmployee()
+        public async Task<ApiResponse> GetOldestEmployee()
         {
+            var response = new ApiResponse();
             try
             {
                 var result = await _employeeconector.GetOldestEmployee();
-                return Ok(result);
+                response.Data = result;
+                response.Result = "ok";
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                response.Result = "error";
+                response.Message = $"Error interno: {ex.Message}";
             }
+            return response;
         }
 
         [HttpGet("GetNewestEmployee")]
-        public async Task<ActionResult<List<Employee>>> GetNewestEmployee()
+        public async Task<ApiResponse> GetNewestEmployee()
         {
+            var response = new ApiResponse();
             try
             {
                 var result = await _employeeconector.GetNewestEmployee();
-                return Ok(result);
+                response.Data = result;
+                response.Result = "ok";
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                response.Result = "error";
+                response.Message = $"Error interno: {ex.Message}";
             }
+            return response;
         }
 
         [HttpGet("GetEmployeesWithMoreThan/{years}")]
-        public async Task<ActionResult<List<Employee>>> GetEmployeesWithMoreThan(int years)
+        public async Task<ApiResponse> GetEmployeesWithMoreThan(int years)
         {
+            var response = new ApiResponse();
             try
             {
                 if (years < 0)
-                    return BadRequest("Los años no pueden ser negativos");
-
-                var result = await _employeeconector.GetEmployeesWithMoreThan(years);
-                return Ok(result);
+                {
+                    response.Result = "error";
+                    response.Message = "Los años no pueden ser negativos";
+                }
+                else
+                {
+                    var result = await _employeeconector.GetEmployeesWithMoreThan(years);
+                    response.Data = result;
+                    response.Result = "ok";
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                response.Result = "error";
+                response.Message = $"Error interno: {ex.Message}";
             }
+            return response;
         }
 
         [HttpGet("GetEmployeesWithLessThan/{years}")]
-        public async Task<ActionResult<List<Employee>>> GetEmployeesWithLessThan(int years)
+        public async Task<ApiResponse> GetEmployeesWithLessThan(int years)
         {
+            var response = new ApiResponse();
             try
             {
                 if (years < 0)
-                    return BadRequest("Los años no pueden ser negativos");
-
-                var result = await _employeeconector.GetEmployeesWithLessThan(years);
-                return Ok(result);
+                {
+                    response.Result = "error";
+                    response.Message = "Los años no pueden ser negativos";
+                }
+                else
+                {
+                    var result = await _employeeconector.GetEmployeesWithLessThan(years);
+                    response.Data = result;
+                    response.Result = "ok";
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                response.Result = "error";
+                response.Message = $"Error interno: {ex.Message}";
             }
+            return response;
         }
     }
 }

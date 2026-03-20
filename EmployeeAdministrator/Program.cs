@@ -10,6 +10,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IEmployeeConnector, EmployeeConnector>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "DemoPolicy",
+        policy =>
+        {
+            policy.AllowAnyOrigin(); 
+            policy.AllowAnyMethod(); 
+            policy.AllowAnyHeader(); 
+        });
+});
+
 var app = builder.Build();
 
 // Middleware
