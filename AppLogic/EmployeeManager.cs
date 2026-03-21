@@ -9,7 +9,7 @@ namespace AppLogic
         Task<List<Employee>> RetrieveAllEmployees();
         Task<List<Employee>> GetAllEmployeesRestSharp();
         Task<List<Employee>> GetAllEmployeesFlurl();
-        Task<Employee?> GetEmployeeManager(int employeeId);
+        Task<List<Employee>> GetAllManagers();
         Task<List<Employee>> GetOldestEmployee();
         Task<List<Employee>> GetNewestEmployee();
         Task<Employee?> GetEmployeeById(int id);
@@ -47,15 +47,16 @@ namespace AppLogic
         }
         #endregion
 
-        public async Task<Employee?> GetEmployeeManager(int employeeId)
+        public async Task<List<Employee>> GetAllManagers()
         {
             var employees = await RetrieveAllEmployees();
-            var employee = employees.FirstOrDefault(e => e.Id == employeeId);
 
-            if (employee?.ManagerId == null)
-                return null;
+            // Un empleado es manager si existe al menos otro empleado que tenga su ID como ManagerId
+            var managers = employees
+                .Where(emp => employees.Any(other => other.ManagerId == emp.Id))
+                .ToList();
 
-            return employees.FirstOrDefault(e => e.Id == employee.ManagerId);
+            return managers;
         }
 
         public async Task<List<Employee>> GetOldestEmployee()

@@ -71,17 +71,17 @@ namespace API.Controllers
             return response;
         }
 
-        [HttpGet("GetEmployeeManager")]
-        public async Task<ApiResponse> GetEmployeeById(int id)
+        [HttpGet("GetAllManagers")]
+        public async Task<ApiResponse> GetAllManagers()
         {
             var response = new ApiResponse();
             try
             {
-                var result = await _employeeconector.GetEmployeeById(id);
-                if (result == null)
+                var result = await _employeeconector.GetAllManagers();
+                if (result == null || !result.Any())
                 {
                     response.Result = "error";
-                    response.Message = $"Empleado con ID {id} no encontrado";
+                    response.Message = "No se encontraron managers registrados";
                 }
                 else
                 {
@@ -97,31 +97,7 @@ namespace API.Controllers
             return response;
         }
 
-        [HttpGet("GetEmployeeManager/{employeeId}")]
-        public async Task<ApiResponse> GetEmployeeManager(int employeeId)
-        {
-            var response = new ApiResponse();
-            try
-            {
-                var result = await _employeeconector.GetEmployeeManager(employeeId);
-                if (result == null)
-                {
-                    response.Result = "error";
-                    response.Message = $"No se encontró manager para el empleado con ID {employeeId}";
-                }
-                else
-                {
-                    response.Data = result;
-                    response.Result = "ok";
-                }
-            }
-            catch (Exception ex)
-            {
-                response.Result = "error";
-                response.Message = $"Error interno: {ex.Message}";
-            }
-            return response;
-        }
+       
 
         [HttpGet("GetOldestEmployee")]
         public async Task<ApiResponse> GetOldestEmployee()
