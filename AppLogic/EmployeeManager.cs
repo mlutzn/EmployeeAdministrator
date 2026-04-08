@@ -1,6 +1,7 @@
 ﻿using DTO;
 using Newtonsoft.Json;
 using RestSharp;
+using DataAccess.Crud;
 
 namespace AppLogic
 {
@@ -15,13 +16,14 @@ namespace AppLogic
         Task<Employee?> GetEmployeeById(int id);
         Task<List<Employee>> GetEmployeesWithMoreThan(int years);
         Task<List<Employee>> GetEmployeesWithLessThan(int years);
-
+        UserSessionDto? ValidateCredentials(string email, string password);
     }
 
     public class EmployeeConnector : IEmployeeConnector
     {
         private HttpClient? _httpClient;
         private const string _baseUrl = "https://rh-central.azurewebsites.net/";
+
         public EmployeeConnector()
         {
             InitializeHttpClient();
@@ -102,11 +104,13 @@ namespace AppLogic
                 .Where(e => DateTime.Parse(e.HiringDate) == newestHiringDate)
                 .ToList();
         }
+
         public async Task<Employee?> GetEmployeeById(int id)
         {
             var employees = await RetrieveAllEmployees();
             return employees.FirstOrDefault(e => e.Id == id);
         }
+
         public async Task<List<Employee>> GetEmployeesWithMoreThan(int years)
         {
             var employees = await RetrieveAllEmployees();
@@ -128,7 +132,22 @@ namespace AppLogic
                            hiringDate >= cutoffDate)
                 .ToList();
         }
-              
+        public UserSessionDto? ValidateCredentials(string email, string password)
+        {
+            var userCrud = new UserCrud();
+            var user = userCrud.GetByEmail(email);
+
+            if (user != null && user.PasswordHash == password)
+            {
+                return new UserSessionDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Rol = user.Rol
+                };
+            }
+            return null;
+        }
 
         #region Métodos Helpers
         private async Task<string> InvokeGetAsync(string uri)

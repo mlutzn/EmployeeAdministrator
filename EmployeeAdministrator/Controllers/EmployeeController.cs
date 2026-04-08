@@ -1,11 +1,13 @@
 ﻿using AppLogic;
 using DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
     [EnableCors("DemoPolicy")]
+    [Authorize(Roles = "ADMIN,SUPER")]
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeController : ControllerBase
@@ -20,6 +22,16 @@ namespace API.Controllers
         [HttpGet("GetAllEmployees")]
         public async Task<ApiResponse> GetAllEmployees()
         {
+
+            // ========== VERIFICAR HEADERS ==========
+            var headers = Request.Headers;
+            Console.WriteLine("=== HEADERS RECIBIDOS ===");
+            foreach (var header in headers)
+            {
+                Console.WriteLine($"{header.Key}: {header.Value}");
+            }
+            // ========================================
+
             var response = new ApiResponse();
             try
             {
