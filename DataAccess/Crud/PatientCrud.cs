@@ -22,10 +22,6 @@ namespace DataAccess.Crud
         {
             throw new NotImplementedException();
         }
-        public override List<T> RetrieveAllByPatientId<T>(int patientId)
-        {
-            throw new NotImplementedException();
-        }
 
         public override List<T> RetrieveAll<T>()
         {
@@ -45,6 +41,10 @@ namespace DataAccess.Crud
 
             return resultList;
 
+        }
+        public override List<T> RetrieveAllByPatientId<T>(int patientId)
+        {
+            throw new NotImplementedException();
         }
 
         public override List<T> RetrieveById<T>(int pId)

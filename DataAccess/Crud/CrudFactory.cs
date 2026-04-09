@@ -13,5 +13,6 @@ namespace DataAccess.Crud
         public abstract List<T> RetrieveAll<T>();
         public abstract List<T> RetrieveById<T>(int pId);
         public abstract List<T> RetrieveAllByPatientId<T>(int patientId);
+
     }
 }

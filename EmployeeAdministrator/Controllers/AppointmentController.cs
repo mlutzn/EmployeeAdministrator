@@ -37,6 +37,13 @@ namespace API.Controllers
             return response;
         }
 
+        [HttpGet("GetAll")]
+        public List<Appointment> GetAllAppointment()
+        {
+            return _appointmentManager.GetAllAppointment();
+        }
+
+
         [HttpGet("GetAppointmentByPatientId")]
         public IActionResult GetAppointmentByPatientId(int patientId)
         {
@@ -64,12 +71,6 @@ namespace API.Controllers
                 response.Message = ex.Message;
                 return StatusCode(500, response);
             }
-        }
-
-        [HttpGet("GetAll")]
-        public List<Appointment> GetAllAppointment()
-        {
-            return _appointmentManager.GetAllAppointment();
         }
     }
 }

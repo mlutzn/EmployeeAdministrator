@@ -23,15 +23,6 @@ namespace API.Controllers
         public async Task<ApiResponse> GetAllEmployees()
         {
 
-            // ========== VERIFICAR HEADERS ==========
-            var headers = Request.Headers;
-            Console.WriteLine("=== HEADERS RECIBIDOS ===");
-            foreach (var header in headers)
-            {
-                Console.WriteLine($"{header.Key}: {header.Value}");
-            }
-            // ========================================
-
             var response = new ApiResponse();
             try
             {

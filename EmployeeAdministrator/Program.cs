@@ -51,6 +51,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddSingleton<IEmployeeConnector, EmployeeConnector>();
+builder.Services.AddSingleton<IAppointmentManager, AppointmentManager>(); 
+builder.Services.AddSingleton<IPatientManager, PatientManager>(); 
 builder.Services.AddScoped<JwtService>();
 
 // 3. CORS

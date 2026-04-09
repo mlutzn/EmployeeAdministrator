@@ -38,7 +38,6 @@ namespace AppLogic
             };
         }
 
-        #region Métodos Originales
         public async Task<List<Employee>> RetrieveAllEmployees()
         {
             string serviceUrl = "/api/RH/GetAllEmployees";
@@ -47,7 +46,6 @@ namespace AppLogic
 
             return dtoEmployees ?? new List<Employee>();
         }
-        #endregion
 
         public async Task<List<Employee>> GetAllManagers()
         {
